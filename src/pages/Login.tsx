@@ -3,26 +3,27 @@ import { Layout, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../store/AuthContext';
+import { toast } from 'react-hot-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      login(response.data.token, response.data.user);
+      toast.success('Welcome back!');
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+      toast.error(err.response?.data?.message || 'Failed to login. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -46,12 +47,6 @@ const Login = () => {
           <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
           <p className="text-slate-400 mt-2">Enter your credentials to access Taskrix</p>
         </div>
-
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg mb-6 text-sm">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
