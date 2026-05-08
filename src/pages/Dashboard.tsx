@@ -16,6 +16,8 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import CreateTaskModal from '../components/CreateTaskModal';
+import { useAuth } from '../store/AuthContext';
+import { toast } from 'react-hot-toast';
 
 interface Task {
   id: string;
@@ -38,21 +40,16 @@ const Dashboard = () => {
   const [stats, setStats] = useState<Stats>({ total: 0, overdue: 0, completed: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userName, setUserName] = useState('');
+  const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-
   useEffect(() => {
-    const userStr = localStorage.getItem('user');
-    if (!userStr) {
+    if (!user) {
       navigate('/login');
       return;
     }
-    const user = JSON.parse(userStr);
-    setUserName(user.name);
-
     fetchData();
-  }, []);
+  }, [user]);
 
   const fetchData = async () => {
     try {
@@ -70,9 +67,19 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    logout();
+    toast.success('Logged out successfully');
     navigate('/');
+  };
+
+  const handleCompleteTask = async (taskId: string) => {
+    try {
+      await api.patch(`/tasks/${taskId}/complete`);
+      toast.success('Task marked as completed!');
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to update task status');
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -135,7 +142,7 @@ const Dashboard = () => {
         {/* Header */}
         <header className="p-6 border-bottom border-white/5 flex justify-between items-center bg-[#080c14]/80 backdrop-blur-md sticky top-0 z-20">
           <div>
-            <h2 className="text-2xl font-bold text-white">Welcome back, {userName.split(' ')[0]}!</h2>
+            <h2 className="text-2xl font-bold text-white">Welcome back, {user?.name.split(' ')[0]}!</h2>
             <p className="text-slate-500 text-sm">Here's what's happening with your projects today.</p>
           </div>
           
@@ -148,12 +155,14 @@ const Dashboard = () => {
                 className="bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-indigo-500 transition-all w-64"
               />
             </div>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="btn-primary flex items-center gap-2 py-2 px-4 text-sm"
-            >
-              <Plus className="w-4 h-4" /> New Task
-            </button>
+            {isAdmin && (
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="btn-primary flex items-center gap-2 py-2 px-4 text-sm"
+              >
+                <Plus className="w-4 h-4" /> New Task
+              </button>
+            )}
 
           </div>
         </header>
@@ -251,9 +260,23 @@ const Dashboard = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button className="p-2 hover:bg-white/10 rounded-lg text-slate-500 transition-colors opacity-0 group-hover:opacity-100">
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
+                          <div className="flex justify-end gap-2">
+                            {task.status !== 'DONE' && (
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCompleteTask(task.id);
+                                }}
+                                className="p-2 hover:bg-green-500/10 rounded-lg text-slate-500 hover:text-green-400 transition-colors opacity-0 group-hover:opacity-100"
+                                title="Mark as Complete"
+                              >
+                                <CheckSquare className="w-4 h-4" />
+                              </button>
+                            )}
+                            <button className="p-2 hover:bg-white/10 rounded-lg text-slate-500 transition-colors opacity-0 group-hover:opacity-100">
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
