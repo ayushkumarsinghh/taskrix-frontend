@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Calendar, Flag, AlignLeft, Type, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
+import { toast } from 'react-hot-toast';
 
 interface CreateTaskModalProps {
   isOpen: boolean;
@@ -15,12 +16,10 @@ const CreateTaskModal = ({ isOpen, onClose, onSuccess }: CreateTaskModalProps) =
   const [priority, setPriority] = useState('MEDIUM');
   const [deadline, setDeadline] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
     try {
       await api.post('/tasks', {
@@ -29,6 +28,7 @@ const CreateTaskModal = ({ isOpen, onClose, onSuccess }: CreateTaskModalProps) =
         priority,
         deadline: new Date(deadline).toISOString(),
       });
+      toast.success('Task created successfully!');
       onSuccess();
       onClose();
       // Reset form
@@ -37,7 +37,7 @@ const CreateTaskModal = ({ isOpen, onClose, onSuccess }: CreateTaskModalProps) =
       setPriority('MEDIUM');
       setDeadline('');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create task. Please try again.');
+      toast.error(err.response?.data?.message || 'Failed to create task. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -72,12 +72,6 @@ const CreateTaskModal = ({ isOpen, onClose, onSuccess }: CreateTaskModalProps) =
               </button>
 
               <h2 className="text-2xl font-bold text-white mb-6">Create New Task</h2>
-
-              {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg mb-6 text-sm">
-                  {error}
-                </div>
-              )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
