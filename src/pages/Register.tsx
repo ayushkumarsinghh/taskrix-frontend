@@ -3,25 +3,25 @@ import { Layout, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
     try {
       await axios.post('http://localhost:5000/api/auth/register', { name, email, password });
+      toast.success('Account created! Please login.');
       navigate('/login');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to register. Please try again.');
+      toast.error(err.response?.data?.message || 'Failed to register. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -45,12 +45,6 @@ const Register = () => {
           <h1 className="text-3xl font-bold text-white">Join Taskrix</h1>
           <p className="text-slate-400 mt-2">Start managing tasks with precision</p>
         </div>
-
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg mb-6 text-sm">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
