@@ -5,29 +5,35 @@ import { Link } from 'react-router-dom';
 
 const Landing = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#0f172a] relative overflow-hidden">
-      {/* Background Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 blur-[120px] rounded-full" />
+    <div className="bg-[#0f172a] min-h-screen text-slate-200 selection:bg-indigo-500/30 selection:text-indigo-200">
+      {/* Background Blobs - Fixed */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 blur-[120px] rounded-full" />
+      </div>
 
       <motion.nav 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="fixed top-0 w-full max-w-7xl flex justify-between items-center p-6 z-50"
+        className="sticky top-0 w-full z-50 bg-[#0f172a]/60 backdrop-blur-xl border-b border-white/5"
       >
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 premium-gradient rounded-xl flex items-center justify-center shadow-lg">
-            <Layout className="text-white w-6 h-6" />
+        <div className="max-w-7xl mx-auto flex justify-between items-center p-6">
+          <div className="flex items-center gap-2 group cursor-pointer">
+            <div className="w-10 h-10 premium-gradient rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+              <Layout className="text-white w-6 h-6" />
+            </div>
+            <span className="text-2xl font-bold tracking-tight text-white">Taskrix</span>
           </div>
-          <span className="text-2xl font-bold tracking-tight text-white">Taskrix</span>
-        </div>
-        <div className="flex gap-6">
-          <Link to="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors pt-2">Login</Link>
-          <Link to="/register" className="btn-primary text-sm">Sign Up</Link>
+          <div className="flex gap-6 items-center">
+            <Link to="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Login</Link>
+            <Link to="/register" className="btn-primary text-sm py-2 px-6">Sign Up</Link>
+          </div>
         </div>
       </motion.nav>
 
-      <main className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mt-20">
+      <div className="relative z-10 flex flex-col items-center">
+
+      <main className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mt-20 px-6">
         <motion.div 
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -40,14 +46,18 @@ const Landing = () => {
             </span>
           </h1>
           <p className="text-xl text-slate-400 mb-8 max-w-lg leading-relaxed">
-            A queue-driven task management system designed for teams that value speed, clarity, and atomic execution.
+            A high-performance task management ecosystem designed for speed and precision. 
+            Built with real-time sync and a fluid kanban interface.
           </p>
           <div className="flex gap-4">
             <Link to="/register" className="btn-primary flex items-center gap-2">
               Get Started <ArrowRight className="w-4 h-4" />
             </Link>
-            <button className="glass-morphism px-8 py-3 font-semibold hover:bg-white/5 transition-all">
-              Documentation
+            <button 
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              className="glass-morphism px-8 py-3 font-semibold hover:bg-white/5 transition-all text-white"
+            >
+              Learn More
             </button>
           </div>
         </motion.div>
@@ -60,18 +70,18 @@ const Landing = () => {
         >
           <div className="space-y-4">
             {[
-              { icon: <CheckSquare className="text-green-400" />, title: "Implement Auth Flow", status: "Done" },
-              { icon: <Clock className="text-amber-400" />, title: "Configure BullMQ Workers", status: "In Progress" },
-              { icon: <Users className="text-blue-400" />, title: "Team Dashboard UI", status: "Todo" },
+              { icon: <CheckSquare className="text-emerald-400" />, title: "Implement Auth Flow", status: "Done" },
+              { icon: <Clock className="text-cyan-400" />, title: "Configure BullMQ Workers", status: "In Progress" },
+              { icon: <Users className="text-indigo-400" />, title: "Team Dashboard UI", status: "Todo" },
             ].map((task, i) => (
               <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/10 transition-all cursor-pointer group">
                 <div className="flex items-center gap-4">
                   {task.icon}
                   <span className="font-medium">{task.title}</span>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  task.status === 'Done' ? 'bg-green-500/20 text-green-400' : 
-                  task.status === 'In Progress' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-500/20 text-slate-400'
+                <span className={`text-xs px-2 py-1 rounded-full border ${
+                  task.status === 'Done' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20' : 
+                  task.status === 'In Progress' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/20' : 'bg-slate-500/20 text-slate-400 border-slate-500/20'
                 }`}>
                   {task.status}
                 </span>
@@ -82,7 +92,73 @@ const Landing = () => {
           <div className="absolute -top-4 -right-4 w-24 h-24 premium-gradient rounded-full blur-[40px] opacity-30" />
         </motion.div>
       </main>
+
+      {/* Features Section */}
+      <section id="features" className="max-w-7xl w-full mx-auto px-6 mt-32 grid grid-cols-1 md:grid-cols-3 gap-8 scroll-mt-24">
+        {[
+          { 
+            icon: <Clock className="text-indigo-400 w-6 h-6" />, 
+            title: "Real-time Sync", 
+            desc: "Tasks update instantly across all devices using high-performance websocket architecture." 
+          },
+          { 
+            icon: <Users className="text-purple-400 w-6 h-6" />, 
+            title: "Team Collaboration", 
+            desc: "Invite members, assign roles, and track progress with precision-built team dashboards." 
+          },
+          { 
+            icon: <Layout className="text-pink-400 w-6 h-6" />, 
+            title: "Smart Analytics", 
+            desc: "Generate background reports and visualize your team's velocity with built-in analytics." 
+          }
+        ].map((feature, i) => (
+          <motion.div 
+            key={i}
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1 }}
+            className="glass-morphism p-8 border-white/5 hover:border-indigo-500/30 transition-all group"
+          >
+            <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              {feature.icon}
+            </div>
+            <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
+          </motion.div>
+        ))}
+      </section>
+
+      {/* Landing Footer */}
+      <footer className="w-full max-w-7xl mx-auto p-6 mt-32 border-t border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 pb-12">
+        <div className="max-w-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 premium-gradient rounded-lg flex items-center justify-center shadow-md">
+              <Layout className="text-white w-4 h-4" />
+            </div>
+            <span className="text-lg font-bold text-white tracking-tighter uppercase">Taskrix</span>
+          </div>
+          <p className="text-sm leading-relaxed text-slate-400 font-medium">
+            Taskrix is a high-performance task management ecosystem designed for speed and precision. 
+            Built with real-time sync, background report generation, and a fluid kanban interface.
+          </p>
+        </div>
+        
+        <div className="flex flex-col md:items-end gap-3">
+          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">Infrastructure Status</div>
+          <div className="flex items-center gap-2 text-[11px] font-bold bg-emerald-500/10 text-emerald-400 px-4 py-1.5 rounded-full border border-emerald-500/20">
+            <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+            Cloud Systems Operational
+          </div>
+          <div className="flex gap-4 text-xs mt-2 text-slate-500">
+            <a href="#" className="hover:text-white transition-colors">Privacy</a>
+            <a href="#" className="hover:text-white transition-colors">Terms</a>
+          </div>
+          <p className="text-[10px] mt-1 text-slate-700">© 2024 Taskrix Labs. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
+  </div>
   );
 };
 
