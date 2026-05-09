@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Layout, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import { Layout, Mail, Lock, ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../store/AuthContext';
+import api from '../services/api';
 import { toast } from 'react-hot-toast';
 
 const Login = () => {
@@ -18,7 +19,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const response = await api.post('/auth/login', { email, password });
       login(response.data.token, response.data.user);
       toast.success('Welcome back!');
       navigate('/dashboard');
@@ -30,7 +31,22 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[#0f172a] relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#0f172a] relative overflow-hidden">
+      {/* Auth Header */}
+      <nav className="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-20">
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="w-10 h-10 premium-gradient rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <Layout className="text-white w-6 h-6" />
+          </div>
+          <span className="text-xl font-bold text-white tracking-tight">Taskrix</span>
+        </Link>
+        
+        <Link to="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </Link>
+      </nav>
+
       {/* Background Blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 blur-[120px] rounded-full" />
