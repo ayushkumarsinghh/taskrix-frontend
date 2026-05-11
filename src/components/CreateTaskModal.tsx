@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, Flag, AlignLeft, Type, Loader2 } from 'lucide-react';
+import { X, Calendar, Flag, AlignLeft, Type, Loader2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
@@ -16,6 +16,25 @@ const CreateTaskModal = ({ isOpen, onClose, onSuccess }: CreateTaskModalProps) =
   const [priority, setPriority] = useState('MEDIUM');
   const [deadline, setDeadline] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
+  const handleAIPlan = async () => {
+    if (!title) {
+      toast.error('Please enter a task title first!');
+      return;
+    }
+
+    setIsAiLoading(true);
+    try {
+      const res = await api.post('/ai/breakdown', { title, description });
+      setDescription(prev => prev ? `${prev}\n\nAI Magic Plan:\n${res.data.breakdown}` : `AI Magic Plan:\n${res.data.breakdown}`);
+      toast.success('Magic plan generated!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'AI is currently offline. Check your API key.');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,14 +109,25 @@ const CreateTaskModal = ({ isOpen, onClose, onSuccess }: CreateTaskModalProps) =
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-300 ml-1">Description</label>
+                  <div className="flex justify-between items-center ml-1">
+                    <label className="text-sm font-medium text-slate-300">Description</label>
+                    <button 
+                      type="button"
+                      onClick={handleAIPlan}
+                      disabled={isAiLoading}
+                      className="text-[10px] uppercase tracking-wider font-bold flex items-center gap-1.5 px-2 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-all disabled:opacity-50"
+                    >
+                      {isAiLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                      Magic Plan
+                    </button>
+                  </div>
                   <div className="relative">
                     <AlignLeft className="absolute left-3 top-4 w-4 h-4 text-slate-500" />
                     <textarea 
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="What needs to be done?"
-                      rows={3}
+                      rows={4}
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600 resize-none"
                     />
                   </div>
@@ -161,3 +191,4 @@ const CreateTaskModal = ({ isOpen, onClose, onSuccess }: CreateTaskModalProps) =
 };
 
 export default CreateTaskModal;
+
