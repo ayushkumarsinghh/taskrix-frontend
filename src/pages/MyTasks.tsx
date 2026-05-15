@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CheckSquare, ArrowRight, ArrowLeft } from 'lucide-react';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
+import TaskDetailModal from '../components/TaskDetailModal';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,6 +23,8 @@ const COLUMNS = [
 const MyTasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchTasks();
@@ -140,6 +143,10 @@ const MyTasks = () => {
                           exit={{ opacity: 0, scale: 0.9 }}
                           whileHover={{ y: -4, transition: { duration: 0.2 } }}
                           className="glass-morphism p-4 cursor-grab hover:border-indigo-500/50 transition-colors group active:cursor-grabbing touch-none"
+                          onClick={() => {
+                            setSelectedTask(task);
+                            setIsModalOpen(true);
+                          }}
                         >
                           <div className="flex justify-between items-start mb-2">
                             <h4 className="font-medium text-white text-sm">{task.title}</h4>
@@ -172,6 +179,13 @@ const MyTasks = () => {
             })}
           </div>
         )}
+
+        <TaskDetailModal 
+          task={selectedTask}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onUpdate={fetchTasks}
+        />
       </div>
   );
 };
