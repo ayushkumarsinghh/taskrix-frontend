@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
 import DashboardLayout from '../components/DashboardLayout';
+import TaskDetailModal from '../components/TaskDetailModal';
 
 interface Task {
   id: string;
@@ -25,6 +26,8 @@ const Dashboard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [stats, setStats] = useState<Stats>({ total: 0, overdue: 0, completed: 0 });
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -141,7 +144,14 @@ const Dashboard = () => {
                   </tr>
                 ) : (
                   tasks.map((task) => (
-                    <tr key={task.id} className="hover:bg-white/[0.02] transition-colors group cursor-pointer">
+                    <tr 
+                      key={task.id} 
+                      className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                      onClick={() => {
+                        setSelectedTask(task);
+                        setIsModalOpen(true);
+                      }}
+                    >
                       <td className="px-6 py-4">
                         <div>
                           <div className="text-white font-medium mb-1">{task.title}</div>
@@ -190,6 +200,13 @@ const Dashboard = () => {
             </table>
           </div>
         </div>
+
+        <TaskDetailModal 
+          task={selectedTask as any}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onUpdate={fetchData}
+        />
       </div>
   );
 };
