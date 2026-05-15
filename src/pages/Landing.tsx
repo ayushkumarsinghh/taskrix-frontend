@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, CheckSquare, Plus, Users, Clock, ArrowRight } from 'lucide-react';
+import { Layout, CheckSquare, Plus, Users, Clock, ArrowRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -107,9 +107,9 @@ const Landing = () => {
             desc: "Invite members, assign roles, and track progress with precision-built team dashboards." 
           },
           { 
-            icon: <Layout className="text-pink-400 w-6 h-6" />, 
-            title: "Smart Analytics", 
-            desc: "Generate background reports and visualize your team's velocity with built-in analytics." 
+            icon: <Sparkles className="text-pink-400 w-6 h-6" />, 
+            title: "AI Magic Plan", 
+            desc: "Instantly break down complex tasks into actionable steps using Gemini 1.5 Pro AI integration." 
           }
         ].map((feature, i) => (
           <motion.div 
